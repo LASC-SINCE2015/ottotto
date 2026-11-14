@@ -82,10 +82,29 @@
     toast.timer = setTimeout(() => t.classList.add('hidden'), 1800);
   }
 
+  function resultText() {
+    return `おっとっとタワーで ${lastResult.score.toLocaleString()} てん！（たかさ ${lastResult.heightCm.toFixed(1)}cm）`;
+  }
+
+  function pageUrl() {
+    return location.href.split(/[?#]/)[0];
+  }
+
+  // X（旧 Twitter）の投稿画面を開く。本文は投稿前に編集できる
+  function postToX() {
+    if (!lastResult) return;
+    const params = new URLSearchParams({
+      text: resultText(),
+      url: pageUrl(),
+      hashtags: 'おっとっとタワー',
+    });
+    window.open(`https://x.com/intent/post?${params.toString()}`, '_blank', 'noopener');
+  }
+
   async function share() {
     if (!lastResult) return;
-    const text = `おっとっとタワーで ${lastResult.score.toLocaleString()} てん！（たかさ ${lastResult.heightCm.toFixed(1)}cm）`;
-    const url = location.href.split('?')[0];
+    const text = resultText();
+    const url = pageUrl();
     try {
       if (navigator.share) {
         await navigator.share({ title: 'おっとっとタワー', text, url });
@@ -136,6 +155,7 @@
   $('btn-retry').addEventListener('click', startGame);
   $('btn-title').addEventListener('click', showTitle);
   $('btn-share').addEventListener('click', share);
+  $('btn-post-x').addEventListener('click', postToX);
   $('btn-sound').addEventListener('click', () => {
     window.Sound.unlock();
     window.Sound.setMuted(!window.Sound.isMuted());

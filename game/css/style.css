@@ -186,6 +186,11 @@ h2 {
   font-size: 22px;
 }
 
+.btn.x {
+  background: #111111;
+  color: #ffffff;
+}
+
 .btn.ghost {
   border-color: transparent;
   background: transparent;
