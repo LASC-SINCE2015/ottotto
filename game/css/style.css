@@ -123,13 +123,16 @@ body {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 16px;
+  overflow-y: auto;
   background: rgba(251, 250, 244, 0.55);
 }
 
 .card {
+  /* 上下の auto で中央に置く。画面より高いときは上から並べてスクロールできるようにする */
+  margin: auto 0;
   width: 100%;
   max-width: 340px;
   padding: 20px 20px 14px;
@@ -248,6 +251,115 @@ h2 {
   to {
     transform: scale(1.12);
   }
+}
+
+/* ---------- みんなのランキング・名前の入力 ---------- */
+.player {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.link {
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rank-msg {
+  margin: 6px 0 0;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.ranking-list {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 52vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.ranking-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1.5px dashed rgba(43, 43, 43, 0.25);
+}
+
+.ranking-list li.me {
+  background: rgba(255, 122, 0, 0.14);
+  border-radius: 8px;
+}
+
+.ranking-list .r-rank {
+  width: 2.2em;
+  font-weight: bold;
+  text-align: right;
+}
+
+.ranking-list li:nth-child(1) .r-rank {
+  color: #d4a000;
+}
+
+.ranking-list li:nth-child(2) .r-rank {
+  color: #8a8a8a;
+}
+
+.ranking-list li:nth-child(3) .r-rank {
+  color: #b5651d;
+}
+
+.ranking-list .r-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-list .r-score {
+  font-weight: bold;
+}
+
+.ranking-list .r-score small {
+  font-size: 0.75em;
+  font-weight: normal;
+  margin-left: 1px;
+}
+
+.ranking-status,
+.ranking-mine,
+.name-help {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ranking-status:empty {
+  display: none;
+}
+
+.name-input {
+  display: block;
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  font-family: var(--font);
+  font-size: 18px;
+  color: var(--ink);
+  background: #fff;
+  border: 2.5px solid var(--line);
+  border-radius: 12px;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .toast {

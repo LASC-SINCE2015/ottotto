@@ -11,7 +11,9 @@
 | `js/chara.js` | キャラクターの描画（表情・焦り・光る演出）。`window.Chara` |
 | `js/sound.js` | 効果音（Web Audio で合成）。`window.Sound` |
 | `js/game.js` | ゲームの進行・入力・カメラ・描画。`window.OttoGame` |
-| `js/main.js` | 画面の切り替えとベストスコアの保存。ゲームとのつなぎ込み |
+| `js/ranking.js` | みんなのランキングの受け口とのやりとり。`window.Ranking` |
+| `js/main.js` | 画面の切り替えとベストスコアの保存、ランキングの表示・名前の入力。ゲームとのつなぎ込み |
+| `ranking.html` | ランキングだけのページ（ほかのページに iframe で貼る用） |
 | `favicon.svg` | タブのアイコン |
 
 - ES モジュールは使わず、普通の `<script>` で読み込む（`index.html` をファイルとして直接開いても動かすため）。
@@ -61,3 +63,26 @@ Box2D-Lite と同じ考え方の、長方形どうしの剛体シミュレーシ
 |---|---|
 | `ottotto.best` | ベストスコア（数値） |
 | `ottotto.mute` | 効果音のオフ（`'1'` / `'0'`） |
+| `ottotto.name` | ランキングに出す名前 |
+| `ottotto.player` | 端末ごとのプレイヤー ID（英小文字と数字 20 文字、ランダム） |
+| `ottotto.sentBest` | ランキングに送った最高点。これを超えたときだけ送る |
+
+## みんなのランキング（ranking.js・gas/ranking.gs）
+
+```
+ゲーム ──POST（スコア）──▶ Google Apps Script のウェブアプリ ──▶ スプレッドシートに 1 行追加
+ゲーム・ranking.html・ほかのページ ◀──GET（JSON）── 同じウェブアプリ
+```
+
+- 受け口の URL は `config.js` の `RANKING_URL`。空ならランキングの表示を隠す。準備の手順は [gas/README.md](../gas/README.md)。
+- 送るときは `Content-Type: text/plain` で JSON を送る（ブラウザの事前確認（preflight）を避けるため。Apps Script は事前確認に応えられない）。
+- 送る内容: `{action:'submit', playerId, name, score, heightCm, count}`。名前だけ変えるときは `{action:'rename', playerId, name}`。
+- 取得: `GET ?n=件数&me=プレイヤーID` → `{ok, total, ranking:[{rank, name, score, heightCm, date, me}], mine}`。
+  - プレイヤー ID は返さない（他人の ID で名前を書きかえられないように）。自分の行にだけ `me: true` を付ける。
+- スプレッドシート
+  - `scores`: 日時・プレイヤーID・スコア・高さ(cm)・匹数（送られるたびに 1 行）
+  - `players`: プレイヤーID・名前（名前はここで一元管理し、変えたら過去の記録にも反映される）
+- 集計: `scores` をプレイヤーごとに最高点でまとめ、点の高い順（同点は先に出した人が上）に並べる。`players` にいない ID は出さない。
+- 同時に送られても行が壊れないよう、書き込みは `LockService` で 1 つずつ行う。
+- はじく条件（匹数 = 落としたキャラの総数 n）: 高さ > 12n cm、または 点 > 120n + 25n(n+1) + 180n（高さ・ピタッと賞の連続・ギリギリ賞とレアをすべて満点で取ったときの上限）。
+- 名前は制御文字を除いて 10 文字に切る。`=` `+` `-` `@` で始まる名前は、シートで数式にならないよう先頭に `'` を付けて保存する。表示はすべて `textContent` で入れる。
