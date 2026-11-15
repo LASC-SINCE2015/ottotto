@@ -1,7 +1,7 @@
 // ゲーム全体の設定値。調整はここで行う。
 window.OTTO_CONFIG = {
   // アプリのバージョン（リリースのたびにパッチを 1 上げる）
-  VERSION: '0.1.1',
+  VERSION: '0.1.2',
 
   // ワールドの横幅（画面の横幅がこの幅に合うように拡大縮小する）
   WORLD_W: 360,
@@ -44,7 +44,16 @@ window.OTTO_CONFIG = {
   // 高さ 1cm あたりの点
   POINT_PER_CM: 10,
 
-  // ベストスコアの保存キー
+  // みんなのランキングの受け口（Google Apps Script のウェブアプリの URL）。空ならランキングは使わない
+  // 準備のしかたは gas/README.md を参照
+  RANKING_URL: 'https://script.google.com/macros/s/AKfycbwBi52W_SyuK9vj6Kw0xOD-2vYy6YTlmPUWGpKrWM5AcNFPTCUn84Djn_YnLXVOeD2f/exec',
+  RANKING_TOP: 10, // ランキングに表示する件数
+  NAME_MAX: 10, // ランキングに出す名前の最大文字数
+
+  // 端末に保存するキー
   STORAGE_BEST: 'ottotto.best',
   STORAGE_MUTE: 'ottotto.mute',
+  STORAGE_NAME: 'ottotto.name', // ランキングに出す名前
+  STORAGE_PLAYER: 'ottotto.player', // 端末ごとのプレイヤー ID
+  STORAGE_SENT: 'ottotto.sentBest', // ランキングに送った最高点
 };

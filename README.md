@@ -4,6 +4,7 @@
 
 - 純粋な HTML5 / CSS / JavaScript（外部ライブラリなし。物理演算も自前）
 - ベストスコアはブラウザの `localStorage` に保存（サーバー不要）
+- みんなのランキングは Google スプレッドシートに記録（Google Apps Script。準備は [gas/README.md](gas/README.md)）
 - GitHub Pages で公開（スマホ・PC 両対応）
 
 ## 遊び方
@@ -20,6 +21,7 @@
 | [design/](design/README.md) | 設計書（どう作るか） |
 | [game/](game/) | ゲーム本体。このフォルダが GitHub Pages で公開される |
 | [assets_src/](assets_src/README.md) | 素材の元ファイル（キャラクターの原画） |
+| [gas/](gas/README.md) | みんなのランキングの受け口（Google Apps Script）と準備の手順 |
 | [testing/](testing/README.md) | 確認内容（テスト計画）と確認結果 |
 | [.github/workflows/](.github/workflows/pages.yml) | GitHub Pages への公開（GitHub Actions） |
 
