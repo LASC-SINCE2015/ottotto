@@ -39,6 +39,10 @@
             <li>まっすぐ重ねると<b>ピタッと賞</b>、ぎりぎりで耐えると<b>ギリギリ賞</b></li>
           </ul>
           <p class="best">ベスト <span id="title-best">0</span> てん</p>
+          <div id="title-ranking" class="hidden">
+            <button id="btn-ranking" class="btn" type="button">みんなのランキング</button>
+            <p class="player">なまえ: <b id="title-name"></b> <button id="btn-name" class="link" type="button">かえる</button></p>
+          </div>
           <p class="version">v<span id="version"></span></p>
         </div>
       </section>
@@ -51,11 +55,35 @@
           <p class="result-sub">たかさ <span id="over-height">0</span>cm ・ <span id="over-count">0</span>匹</p>
           <p id="over-new" class="new hidden">ベスト更新！</p>
           <p class="best">ベスト <span id="over-best">0</span> てん</p>
+          <p id="over-rank" class="rank-msg hidden"></p>
           <button id="btn-retry" class="btn primary" type="button">もういちど</button>
+          <button id="btn-over-ranking" class="btn hidden" type="button">みんなのランキング</button>
           <button id="btn-post-x" class="btn x" type="button">𝕏 にポスト</button>
           <button id="btn-share" class="btn" type="button">結果をシェア</button>
           <button id="btn-title" class="btn ghost" type="button">タイトルへ</button>
         </div>
+      </section>
+
+      <!-- みんなのランキング -->
+      <section id="ranking" class="overlay hidden">
+        <div class="card">
+          <h2>みんなのランキング</h2>
+          <ol id="ranking-list" class="ranking-list"></ol>
+          <p id="ranking-status" class="ranking-status"></p>
+          <p id="ranking-mine" class="ranking-mine hidden"></p>
+          <button id="btn-ranking-close" class="btn" type="button">とじる</button>
+        </div>
+      </section>
+
+      <!-- 名前の入力 -->
+      <section id="name-dialog" class="overlay hidden">
+        <form id="name-form" class="card">
+          <h2>なまえ</h2>
+          <p class="name-help">ランキングにのせる名前（<span id="name-max"></span>文字まで）<br />本名ではなくニックネームにしてね</p>
+          <input id="name-input" class="name-input" type="text" autocomplete="nickname" enterkeyhint="done" />
+          <button class="btn primary" type="submit">けってい</button>
+          <button id="btn-name-cancel" class="btn ghost" type="button">やめる</button>
+        </form>
       </section>
 
       <div id="toast" class="toast hidden"></div>
@@ -65,6 +93,7 @@
     <script src="js/physics.js"></script>
     <script src="js/chara.js"></script>
     <script src="js/sound.js"></script>
+    <script src="js/ranking.js"></script>
     <script src="js/game.js"></script>
     <script src="js/main.js"></script>
   </body>

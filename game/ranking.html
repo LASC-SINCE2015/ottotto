@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fbfaf4" />
+    <title>おっとっとタワー ランキング</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      /* ほかのページに iframe で貼っても収まるよう、ランキングだけを表示する */
+      html,
+      body {
+        height: auto;
+        background: transparent;
+        -webkit-user-select: auto;
+        user-select: auto;
+      }
+      .card {
+        margin: 8px auto;
+      }
+      .ranking-list {
+        max-height: none;
+      }
+      .play {
+        display: block;
+        margin-top: 10px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>みんなのランキング</h2>
+      <ol id="ranking-list" class="ranking-list"></ol>
+      <p id="ranking-status" class="ranking-status">よみこみ中…</p>
+      <a class="btn primary play" href="./" target="_top">あそぶ</a>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/ranking.js"></script>
+    <script>
+      (function () {
+        'use strict';
+        // ?n=件数 で表示する件数を変えられる（1〜100）
+        const n = Math.max(1, Math.min(100, parseInt(new URLSearchParams(location.search).get('n'), 10) || 20));
+        const list = document.getElementById('ranking-list');
+        const status = document.getElementById('ranking-status');
+
+        if (!window.Ranking.enabled) {
+          status.textContent = 'ランキングはまだ準備中です';
+          return;
+        }
+        window.Ranking.fetchTop(n)
+          .then((d) => {
+            status.textContent = d.ranking.length ? '' : 'まだ だれも のっていません';
+            d.ranking.forEach((r) => {
+              const li = document.createElement('li');
+              if (r.me) li.classList.add('me');
+              const rank = document.createElement('span');
+              rank.className = 'r-rank';
+              rank.textContent = `${r.rank}位`;
+              const name = document.createElement('span');
+              name.className = 'r-name';
+              name.textContent = r.name;
+              const score = document.createElement('span');
+              score.className = 'r-score';
+              score.textContent = Number(r.score).toLocaleString();
+              const unit = document.createElement('small');
+              unit.textContent = 'てん';
+              score.appendChild(unit);
+              li.append(rank, name, score);
+              list.appendChild(li);
+            });
+          })
+          .catch(() => {
+            status.textContent = 'ランキングを読みこめませんでした';
+          });
+      })();
+    </script>
+  </body>
+</html>

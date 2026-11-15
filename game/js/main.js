@@ -55,8 +55,113 @@
     $('over-count').textContent = r.count;
     $('over-best').textContent = best.toLocaleString();
     $('over-new').classList.toggle('hidden', !isNew);
+    $('over-rank').classList.add('hidden');
     $('hud').classList.add('hidden');
     $('over').classList.remove('hidden');
+    if (R.enabled && R.needsSubmit(r.score)) {
+      if (R.getName()) submitScore(r);
+      else askName(() => submitScore(r));
+    }
+  }
+
+  // ---- みんなのランキング ----
+  const R = window.Ranking;
+
+  function setRankMsg(text) {
+    const el = $('over-rank');
+    el.textContent = text;
+    el.classList.toggle('hidden', !text);
+  }
+
+  async function submitScore(r) {
+    setRankMsg('ランキングに送っています…');
+    try {
+      const d = await R.submit(r);
+      // 結果が届く前に次のゲームを始めていたら、表示は書きかえない
+      if (lastResult !== r) return;
+      setRankMsg(`みんなのランキング ${d.rank}位（${d.total}人中）`);
+    } catch (e) {
+      if (lastResult === r) setRankMsg('ランキングに送れませんでした');
+    }
+  }
+
+  // 名前の入力。決めたら done() を呼ぶ
+  let nameDone = null;
+  function askName(done) {
+    nameDone = done || null;
+    const input = $('name-input');
+    input.value = R.getName();
+    $('name-dialog').classList.remove('hidden');
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function closeName() {
+    $('name-dialog').classList.add('hidden');
+    nameDone = null;
+  }
+
+  async function onNameSubmit(e) {
+    e.preventDefault();
+    const name = R.cleanName($('name-input').value);
+    if (!name) {
+      toast('名前を入れてね');
+      return;
+    }
+    const done = nameDone;
+    closeName();
+    try {
+      await R.setName(name);
+    } catch (err) {
+      toast('名前をランキングに送れませんでした');
+    }
+    updatePlayer();
+    if (done) done();
+  }
+
+  function updatePlayer() {
+    $('title-ranking').classList.toggle('hidden', !R.enabled);
+    $('btn-over-ranking').classList.toggle('hidden', !R.enabled);
+    $('title-name').textContent = R.getName() || '（まだ）';
+  }
+
+  function rankingRow(r) {
+    const li = document.createElement('li');
+    if (r.me) li.classList.add('me');
+    const rank = document.createElement('span');
+    rank.className = 'r-rank';
+    rank.textContent = `${r.rank}位`;
+    const name = document.createElement('span');
+    name.className = 'r-name';
+    name.textContent = r.name; // textContent で入れる（名前に HTML が入っていても安全）
+    const score = document.createElement('span');
+    score.className = 'r-score';
+    score.textContent = Number(r.score).toLocaleString();
+    const unit = document.createElement('small');
+    unit.textContent = 'てん';
+    score.appendChild(unit);
+    li.append(rank, name, score);
+    return li;
+  }
+
+  async function showRanking() {
+    const list = $('ranking-list');
+    const status = $('ranking-status');
+    const mine = $('ranking-mine');
+    list.innerHTML = '';
+    mine.classList.add('hidden');
+    status.textContent = 'よみこみ中…';
+    $('ranking').classList.remove('hidden');
+    try {
+      const d = await R.fetchTop(CFG.RANKING_TOP);
+      status.textContent = d.ranking.length ? '' : 'まだ だれも のっていません';
+      d.ranking.forEach((r) => list.appendChild(rankingRow(r)));
+      if (d.mine && !d.ranking.some((r) => r.me)) {
+        mine.textContent = `あなたは ${d.mine.rank}位（${d.total}人中）・${Number(d.mine.score).toLocaleString()} てん`;
+        mine.classList.remove('hidden');
+      }
+    } catch (e) {
+      status.textContent = 'ランキングを読みこめませんでした';
+    }
   }
 
   function startGame() {
@@ -161,6 +266,15 @@
     window.Sound.setMuted(!window.Sound.isMuted());
     updateSoundBtn();
   });
+  $('name-max').textContent = CFG.NAME_MAX;
+  $('name-input').maxLength = CFG.NAME_MAX * 2; // 絵文字などは 2 文字ぶんになるため。最終的な長さは cleanName でそろえる
+  $('btn-ranking').addEventListener('click', showRanking);
+  $('btn-over-ranking').addEventListener('click', showRanking);
+  $('btn-ranking-close').addEventListener('click', () => $('ranking').classList.add('hidden'));
+  $('btn-name').addEventListener('click', () => askName());
+  $('btn-name-cancel').addEventListener('click', closeName);
+  $('name-form').addEventListener('submit', onNameSubmit);
+  updatePlayer();
   updateSoundBtn();
   showTitle();
   animateTitle();
